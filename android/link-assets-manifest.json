@@ -1,0 +1,65 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/Alvi Nastaleeq Regular.ttf",
+      "sha1": "b83643d5a56c2bbf90ba10c62969b3afe67378ed"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-Black.ttf",
+      "sha1": "40c8570e9c8bc9652bb36405037f1980b7ccb885"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-BlackItalic.ttf",
+      "sha1": "0f2b8e58e9687913ed4b00a745a45268c7f33b72"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-Bold.ttf",
+      "sha1": "a48fd5d1a6328253fce242461287b26fafa0cacb"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-BoldItalic.ttf",
+      "sha1": "db2273e7f623673467f1710302f8a285d258a865"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-Book.ttf",
+      "sha1": "7eb09f7ae894b1f47d70177875d9ba946acb6d2a"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-BookItalic.ttf",
+      "sha1": "75110abe843616b4c45d6be53f90f00a9324594d"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-Heavy.ttf",
+      "sha1": "f4f6a4d9c0cbbefc1de09af72a37559d748f8198"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-HeavyItalic.ttf",
+      "sha1": "48d5fb1ab50e12873d3ae81115856ad555358563"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-Light.ttf",
+      "sha1": "971876f7f82f6b55aac45d029ef67f910b0d2b9e"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-LightItalic.ttf",
+      "sha1": "5b1cc96988a04392406d1f91b1b4e68b01c9cc30"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-Regular.ttf",
+      "sha1": "e41b896180d13cf002038d3ad9b862f4a3fc0676"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-RegularItalic.ttf",
+      "sha1": "e40d36f63ba6a63c02c397c5cecc3b86b2538aca"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-Thin.ttf",
+      "sha1": "f7afa3ceb4c2a20db3cce838a6717d9606acb6cf"
+    },
+    {
+      "path": "src/assets/fonts/UniNeue-Trial-ThinItalic.ttf",
+      "sha1": "b5c12cb2f3f6e9248229945b1a0c84bc0e22d3e0"
+    }
+  ]
+}
