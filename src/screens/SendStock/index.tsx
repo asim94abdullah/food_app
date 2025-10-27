@@ -241,11 +241,28 @@ const SendStock = (props: SendStockProps) => {
     const values = Object.values(hiddenData);
 
     for (let i = 0; i < keys.length; i++) {
-      data.append(keys[i], values[i]);
+      const key = keys[i];
+      const value = values[i];
+
+      // 🛑 Skip keys that are already appended manually
+      if (
+        [
+          'procurement_allocation_id',
+          'subcenter_id',
+          'source_id',
+          'company_id',
+          'from_company_id',
+          'to_company_id',
+          'pr_notification_id',
+        ].includes(key)
+      ) {
+        continue;
+      }
+
+      data.append(key, value);
     }
 
-    // console.log('payload-1', data);
-
+    // console.log('asimmmmmmmmm', data);
     api
       .shipmentStore(data, showPrToPr)
       .then(response => {
@@ -374,8 +391,16 @@ const SendStock = (props: SendStockProps) => {
   };
 
   const getSubcenter = (item: TypeDropdownItem) => {
+    let data = {
+      contractor_id: hiddenData?.contractor_id,
+      source_id: item?.id,
+      procurement_allocation_id: allocation?.id,
+    };
+
+    console.log('datadata', data);
+
     api
-      .getSubcentersList(item?.id)
+      .getSubcentersList(data)
       .then(response => {
         const respData = getDataFrom(response);
         if (respData) {
@@ -524,6 +549,8 @@ const SendStock = (props: SendStockProps) => {
     pp100IndgBags,
   ]);
 
+  console.log('allocation', allocation);
+
   return (
     <Container>
       <View style={styles.container}>
@@ -575,10 +602,17 @@ const SendStock = (props: SendStockProps) => {
                 />
                 <Dropdown
                   data={srcList}
-                  onItemSelect={changeSrc}
                   label={loadingData ? 'Loading...' : 'Wheat Source'}
                   value={src}
                   style={styles.input}
+                  onBeforeOpen={() => {
+                    if (!allocation || !allocation.id) {
+                      Alert.alert('Message', 'Please select allocation first');
+                      return false; // prevent modal
+                    }
+                    return true; // allow modal
+                  }}
+                  onItemSelect={item => changeSrc(item)}
                 />
 
                 <Dropdown

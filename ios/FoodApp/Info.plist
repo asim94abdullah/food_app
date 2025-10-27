@@ -45,12 +45,12 @@
 	<string>Location services are required to access your location</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Location services are required to access your location</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Photos access is required to upload pictorial evidence</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Photos access is required to upload pictorial evidence</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Aaccess required for opening camera</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Photos access is required to upload pictorial evidence</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photos access is required to upload pictorial evidence</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>UniNeue-Trial-Black.ttf</string>
@@ -94,8 +94,12 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>

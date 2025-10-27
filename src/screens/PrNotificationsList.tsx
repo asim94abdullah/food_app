@@ -48,48 +48,56 @@ const PrNotificationsList = () => {
 
   React.useEffect(getHistory, []);
 
-  const renderCard = ({item}: {item: any}) => (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      onPress={() =>
-        navigation.navigate(Routes.SendStock, {...params, notification: item})
-      }>
-      <Card style={styles.card}>
-        <Card.Content>
-          <View style={styles.headerRow}>
-            <Text style={styles.companyTitle}>{item.from_company_title}</Text>
-            <View style={styles.dateBadge}>
-              <Text style={styles.dateText}>
-                {moment(new Date(item.dated)).format('DD MMM YYYY')}
-              </Text>
-            </View>
-          </View>
+  const renderCard = ({item}: {item: any}) => {
+    console.log('itemmmm', item);
 
-          <View style={styles.divider} />
-
-          <View style={styles.row}>
-            <Text style={styles.label}>Destination : </Text>
-            <Text style={styles.value}>{item.to_company_title}</Text>
-          </View>
-
-          <View style={styles.rowBetween}>
-            <View style={styles.infoBox}>
-              <Text style={styles.label}>Notified Qty</Text>
-              <Text style={styles.value}>
-                {item.prc_notification_qty || '-'} MT
-              </Text>
+    return (
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={() =>
+          navigation.navigate(Routes.SendStock, {...params, notification: item})
+        }>
+        <Card style={styles.card}>
+          <Card.Content>
+            <View style={styles.headerRow}>
+              <Text style={styles.companyTitle}>{item.from_company_title}</Text>
+              <View style={styles.dateBadge}>
+                <Text style={styles.dateText}>
+                  {moment(new Date(item.dated)).format('DD MMM YYYY')}
+                </Text>
+              </View>
             </View>
-            <View style={styles.infoBox}>
-              <Text style={styles.label}>Issued Qty</Text>
-              <Text style={styles.value}>
-                {item.prc_shipment_qty || '-'} MT
-              </Text>
+
+            <View style={styles.divider} />
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Destination : </Text>
+              <Text style={styles.value}>{item.to_company_title}</Text>
             </View>
-          </View>
-        </Card.Content>
-      </Card>
-    </TouchableOpacity>
-  );
+
+            <View style={styles.rowBetween}>
+              <View style={styles.infoBox}>
+                <Text style={styles.label}>Notified Qty</Text>
+                <Text style={styles.value}>
+                  {item.prc_notification_qty || '-'} MT
+                </Text>
+              </View>
+              <View style={styles.infoBox}>
+                <Text style={styles.label}>Stockout Qty</Text>
+                <Text style={styles.value}>
+                  {item.prc_stockout_qty || '-'} MT
+                </Text>
+              </View>
+              <View style={styles.infoBox}>
+                <Text style={styles.label}>Shiped Qty</Text>
+                <Text style={styles.value}>{item.prc_shipment_qty} MT</Text>
+              </View>
+            </View>
+          </Card.Content>
+        </Card>
+      </TouchableOpacity>
+    );
+  };
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>

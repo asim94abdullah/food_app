@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Reactotron from 'reactotron-react-native';
 
 // ⚠️ Replace with your Mac's IP (same Wi-Fi as your phone/emulator)
-const host = '10.0.20.44';
+const host = '192.168.1.143';
 
 const reactotron = Reactotron.setAsyncStorageHandler(AsyncStorage)
   .configure({

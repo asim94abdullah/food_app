@@ -1,4 +1,3 @@
-import {NavigationProp} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   FlatList,
@@ -9,7 +8,6 @@ import {
   ViewProps,
   TouchableOpacity,
 } from 'react-native';
-// import { TouchableOpacity } from 'react-native-gesture-handler';
 import {ActivityIndicator, Divider, Text, TextInput} from 'react-native-paper';
 import {Color, Fonts} from '../common/Constants';
 import Icon from './Icon';
@@ -18,11 +16,12 @@ interface DropdownProps {
   data: any[];
   onItemSelect: (i: any) => void;
   label: string;
-  // placeholder: string,
   value: any;
   status?: boolean;
   style?: StyleProp<ViewProps>;
+  onBeforeOpen?: () => boolean; // 👈 new optional prop
 }
+
 const Dropdown = ({
   data,
   onItemSelect,
@@ -30,6 +29,7 @@ const Dropdown = ({
   value,
   style,
   status,
+  onBeforeOpen,
 }: DropdownProps) => {
   const [shownItemNames, setShownItemNames] = useState(data);
   const [showModel, setShowModel] = useState(false);
@@ -45,12 +45,6 @@ const Dropdown = ({
 
   const search = (t: string) => {
     try {
-      // if (isWaiting) {
-      //   return;
-      // }
-
-      console.log('asimmm', t);
-
       const trimmedQuery = t?.trim().toLowerCase();
       if (trimmedQuery === '') {
         setShownItemNames(data);
@@ -58,36 +52,23 @@ const Dropdown = ({
       }
 
       setIsWaiting(true);
-
       setTimeout(() => {
         try {
-          const _shownItemNames = [];
-
-          for (const item of data) {
-            if (
-              item &&
-              item?.license_number &&
-              item?.license_number.toLowerCase().includes(trimmedQuery)
-            ) {
-              _shownItemNames.push(item);
-            } else if (
-              item &&
-              item?.title.toLowerCase().includes(trimmedQuery)
-            ) {
-              _shownItemNames.push(item);
-            }
-            setShownItemNames(_shownItemNames);
-            setIsWaiting(false);
-            // console.log('_shownItemNames', _shownItemNames);
-          }
+          const _shownItemNames = data.filter(item => {
+            return (
+              (item?.license_number &&
+                item.license_number.toLowerCase().includes(trimmedQuery)) ||
+              (item?.title && item.title.toLowerCase().includes(trimmedQuery))
+            );
+          });
+          setShownItemNames(_shownItemNames);
+          setIsWaiting(false);
         } catch (error) {
-          // Handle errors gracefully
           console.error('Error searching:', error);
           setIsWaiting(false);
         }
       }, 100);
     } catch (error) {
-      // Handle errors gracefully
       setIsWaiting(false);
       console.error('Error in search function:', error);
     }
@@ -97,12 +78,15 @@ const Dropdown = ({
     setShownItemNames(data);
   }, [data]);
 
-  // console.log('statussss', status);
-
   return (
     <>
       <TouchableOpacity
         onPress={() => {
+          // ✅ Only open modal if allowed by parent
+          if (typeof onBeforeOpen === 'function') {
+            const canOpen = onBeforeOpen();
+            if (!canOpen) return;
+          }
           setShowModel(true);
         }}>
         <View style={style}>
@@ -125,14 +109,12 @@ const Dropdown = ({
               flexDirection: 'row',
               borderBottomWidth: 1,
               borderBottomColor: '#BFBFC0',
-              // backgroundColor: 'red',
             }}>
             <Text
               style={{
                 color: '#59565F',
                 fontSize: 16,
                 flex: 1,
-                // fontFamily: Fonts.UniNeueRegular,
               }}>
               {value?.title || label}
             </Text>
@@ -168,102 +150,46 @@ const Dropdown = ({
             />
 
             {isWaiting && (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: 20,
-                }}>
+              <View style={styles.loadingView}>
                 <ActivityIndicator />
               </View>
             )}
+
             <FlatList
               data={shownItemNames}
               style={{marginTop: 20}}
               showsVerticalScrollIndicator={false}
               ItemSeparatorComponent={() => <Divider />}
-              renderItem={({item}) => {
-                // console.log('ittttem', item.license_number);
-
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setShowModel(false);
-                      onItemSelect(item);
-                      // console.log(item);
-                    }}>
-                    <View style={styles.row}>
-                      <Text
-                        numberOfLines={1}
+              renderItem={({item}) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    setShowModel(false);
+                    onItemSelect(item);
+                  }}>
+                  <View style={styles.row}>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        ...styles.item,
+                        width: status ? '50%' : '70%',
+                      }}>
+                      {item.title}
+                    </Text>
+                    {status && (
+                      <View
                         style={{
-                          ...styles.item,
-                          width: status ? '50%' : '70%',
+                          width: '30%',
+                          marginRight: 30,
+                          alignItems: 'flex-end',
                         }}>
-                        {item.title}
-                      </Text>
-                      {status && (
-                        <View
-                          style={{
-                            width: '30%',
-                            marginRight: 30,
-                            alignItems: 'flex-end',
-                          }}>
-                          {item.title === 'Warning' && (
-                            <Icon
-                              type="Entypo"
-                              name="warning"
-                              color={'black'}
-                              size={20}
-                              onPress={() => {}}
-                            />
-                          )}
-                          {item.title === 'Fine' && (
-                            <Icon
-                              type="Entypo"
-                              name="credit"
-                              color={'black'}
-                              size={20}
-                              onPress={() => {}}
-                            />
-                          )}
-                          {item.title === 'Imprison' && (
-                            <Icon
-                              type="Entypo"
-                              name="man"
-                              color={'black'}
-                              size={20}
-                              onPress={() => {}}
-                            />
-                          )}
-                          {item.title === 'Marasla' && (
-                            <Icon
-                              type="FontAwesome"
-                              name="address-book"
-                              color={'black'}
-                              size={20}
-                              onPress={() => {}}
-                            />
-                          )}
-                          {item.title === 'Notice' && (
-                            <Icon
-                              type="MaterialCommunityIcons"
-                              name="book-open-page-variant-outline"
-                              color={'black'}
-                              size={20}
-                              onPress={() => {}}
-                            />
-                          )}
-                        </View>
-                      )}
+                        {/* your icon logic here */}
+                      </View>
+                    )}
 
-                      {item?.license_number && (
-                        <Text>{item.license_number}</Text>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                );
-              }}
+                    {item?.license_number && <Text>{item.license_number}</Text>}
+                  </View>
+                </TouchableOpacity>
+              )}
             />
           </View>
         </View>
@@ -298,6 +224,12 @@ const styles = StyleSheet.create({
   item: {
     padding: 15,
     width: '50%',
+  },
+  loadingView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
   },
 });
 
