@@ -155,7 +155,7 @@ export default class Api {
     }
 
     getSubcentersList(data: object) {
-        return this.api.post('/supplychain/subcenter-list/' , data);
+        return this.api.post('/supplychain/subcenter-list' , data);
     }
 
     getMillStats(data: FormData) {

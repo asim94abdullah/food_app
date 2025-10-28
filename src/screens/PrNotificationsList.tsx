@@ -19,6 +19,7 @@ import {getDataFrom, handleError} from '../common/Utils';
 import Container from '../components/Container';
 import Header from '../components/Header';
 import {RootState} from '../redux/store';
+import {moderateScale, verticalScale} from 'react-native-size-matters';
 
 const PrNotificationsList = () => {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -27,7 +28,37 @@ const PrNotificationsList = () => {
   const dispatch = useDispatch();
   const api = new Api(User, dispatch);
   const {params} = useRoute();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+
+  let data = [
+    {
+      id: 1,
+      from_company_title: 'Company A',
+      to_company_title: 'Company B',
+      dated: '2024-06-01',
+      prc_notification_qty: 100,
+      prc_stockout_qty: 20,
+      prc_shipment_qty: 80,
+    },
+    {
+      id: 2,
+      from_company_title: 'Company C',
+      to_company_title: 'Company D',
+      dated: '2024-06-05',
+      prc_notification_qty: 200,
+      prc_stockout_qty: 50,
+      prc_shipment_qty: 150,
+    },
+    {
+      id: 3,
+      from_company_title: 'Company E',
+      to_company_title: 'Company F',
+      dated: '2024-06-10',
+      prc_notification_qty: 150,
+      prc_stockout_qty: 30,
+      prc_shipment_qty: 120,
+    },
+  ];
 
   const getHistory = () => {
     setIsLoading(true);
@@ -57,7 +88,7 @@ const PrNotificationsList = () => {
         onPress={() =>
           navigation.navigate(Routes.SendStock, {...params, notification: item})
         }>
-        <Card style={styles.card}>
+        <Card style={styles.parentCard}>
           <Card.Content>
             <View style={styles.headerRow}>
               <Text style={styles.companyTitle}>{item.from_company_title}</Text>
@@ -79,23 +110,126 @@ const PrNotificationsList = () => {
               <View style={styles.infoBox}>
                 <Text style={styles.label}>Notified Qty</Text>
                 <Text style={styles.value}>
-                  {item.prc_notification_qty || '-'} MT
+                  {item?.prc_notification_qty || '-'} MT
                 </Text>
               </View>
               <View style={styles.infoBox}>
                 <Text style={styles.label}>Stockout Qty</Text>
                 <Text style={styles.value}>
-                  {item.prc_stockout_qty || '-'} MT
+                  {item?.prc_stockout_qty || '-'} MT
                 </Text>
               </View>
               <View style={styles.infoBox}>
                 <Text style={styles.label}>Shiped Qty</Text>
-                <Text style={styles.value}>{item.prc_shipment_qty} MT</Text>
+                <Text style={styles.value}>{item?.prc_shipment_qty} MT</Text>
               </View>
             </View>
           </Card.Content>
         </Card>
       </TouchableOpacity>
+      // <Card style={styles.parentCard}>
+      //   <Card.Content>
+      //     {/* === Parent Header === */}
+      //     <View style={styles.headerRow}>
+      //       <Text style={styles.companyTitle}>{item.from_company_title}</Text>
+      //       <View style={styles.dateBadge}>
+      //         <Text style={styles.dateText}>
+      //           {moment(new Date(item.dated)).format('DD MMM YYYY')}
+      //         </Text>
+      //       </View>
+      //     </View>
+
+      //     <View style={styles.divider} />
+
+      //     <View style={styles.row}>
+      //       <Text style={styles.label}>Destination : </Text>
+      //       <Text style={styles.value}>{item.to_company_title}</Text>
+      //     </View>
+
+      //     <View style={styles.rowBetween}>
+      //       <View style={styles.infoBox}>
+      //         <Text style={styles.label}>Notified Qty</Text>
+      //         <Text style={styles.value}>
+      //           {item.prc_notification_qty || '-'} MT
+      //         </Text>
+      //       </View>
+      //       <View style={styles.infoBox}>
+      //         <Text style={styles.label}>Stockout Qty</Text>
+      //         <Text style={styles.value}>
+      //           {item.prc_stockout_qty || '-'} MT
+      //         </Text>
+      //       </View>
+      //       <View style={styles.infoBox}>
+      //         <Text style={styles.label}>Shipped Qty</Text>
+      //         <Text style={styles.value}>{item.prc_shipment_qty} MT</Text>
+      //       </View>
+      //     </View>
+
+      //     {/* === Nested Clickable Cards === */}
+      //     {data.length > 0 && (
+      //       <View style={styles.nestedContainer}>
+      //         {data.map((child: any, index: number) => (
+      //           <TouchableOpacity
+      //             key={index}
+      //             activeOpacity={0.9}
+      //             onPress={() =>
+      //               navigation.navigate(Routes.SendStock, {
+      //                 ...params,
+      //                 notification: child,
+      //               })
+      //             }>
+      //             <Card style={styles.nestedCard}>
+      //               <Card.Content>
+      //                 <View style={styles.rowBetween}>
+      //                   <Text style={styles.companyTitle}>
+      //                     {child.from_company_title}
+      //                   </Text>
+      //                   <View style={styles.dateBadge}>
+      //                     <Text style={styles.dateText}>
+      //                       {moment(new Date(child.dated)).format(
+      //                         'DD MMM YYYY',
+      //                       )}
+      //                     </Text>
+      //                   </View>
+      //                 </View>
+
+      //                 <View style={styles.divider} />
+
+      //                 <View style={styles.row}>
+      //                   <Text style={styles.label}>Destination : </Text>
+      //                   <Text style={styles.value}>
+      //                     {child.to_company_title}
+      //                   </Text>
+      //                 </View>
+
+      //                 <View style={styles.rowBetween}>
+      //                   <View style={styles.infoBox}>
+      //                     <Text style={styles.label}>Notified Qty</Text>
+      //                     <Text style={styles.value}>
+      //                       {child.prc_notification_qty || '-'} MT
+      //                     </Text>
+      //                   </View>
+      //                   <View style={styles.infoBox}>
+      //                     <Text style={styles.label}>Stockout Qty</Text>
+      //                     <Text style={styles.value}>
+      //                       {child.prc_stockout_qty || '-'} MT
+      //                     </Text>
+      //                   </View>
+      //                   <View style={styles.infoBox}>
+      //                     <Text style={styles.label}>Shipped Qty</Text>
+      //                     <Text style={styles.value}>
+      //                       {child.prc_shipment_qty || '-'} MT
+      //                     </Text>
+      //                   </View>
+      //                 </View>
+      //               </Card.Content>
+      //             </Card>
+      //           </TouchableOpacity>
+      //         ))}
+      //       </View>
+      //     )}
+      //   </Card.Content>
+      // </Card>
     );
   };
 
@@ -121,6 +255,7 @@ const PrNotificationsList = () => {
         </View>
       ) : (
         <FlatList
+          // data={[...history, ...history]}
           data={history}
           showsVerticalScrollIndicator={false}
           renderItem={renderCard}
@@ -136,91 +271,81 @@ const PrNotificationsList = () => {
 export default PrNotificationsList;
 
 const styles = StyleSheet.create({
-  card: {
-    marginHorizontal: 20,
-    marginVertical: 10,
-    borderRadius: 16,
+  parentCard: {
+    marginVertical: verticalScale(8),
+    marginHorizontal: verticalScale(10),
+    borderRadius: moderateScale(12),
     backgroundColor: '#fff',
     elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: {width: 0, height: 3},
+    padding: 4,
+  },
+  nestedContainer: {
+    marginTop: verticalScale(10),
+  },
+  nestedCard: {
+    marginVertical: verticalScale(5),
+    borderRadius: moderateScale(8),
+    backgroundColor: '#f8f8f8',
+    elevation: 2,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  companyTitle: {
-    fontFamily: Fonts.UniNeueBold,
-    color: Color.textDark,
-    fontSize: 14,
   },
   dateBadge: {
-    backgroundColor: Color.Green,
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    backgroundColor: '#52d948ff',
+    borderRadius: moderateScale(8),
+    paddingHorizontal: moderateScale(6),
+    paddingVertical: 2,
   },
   dateText: {
-    color: '#fff',
-    fontFamily: Fonts.UniNeueRegular,
-    fontSize: 10,
+    fontSize: moderateScale(12),
+    color: '#ffffffff',
+  },
+  companyTitle: {
+    fontSize: moderateScale(16),
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  label: {
+    fontWeight: '600',
+    color: '#333',
+  },
+  value: {
+    color: '#666',
   },
   divider: {
     height: 1,
-    backgroundColor: '#eee',
-    marginVertical: 8,
+    backgroundColor: '#ddd',
+    marginVertical: verticalScale(8),
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    marginVertical: verticalScale(2),
   },
   rowBetween: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 8,
+    alignItems: 'center',
+    marginVertical: verticalScale(4),
   },
   infoBox: {
-    flex: 1,
-  },
-  label: {
-    fontFamily: Fonts.UniNeueBold,
-    color: Color.textDark,
-    fontSize: 11,
-  },
-  value: {
-    fontFamily: Fonts.UniNeueBold,
-    color: Color.textLight,
-    fontSize: 11,
-    marginTop: 2,
+    alignItems: 'center',
   },
   loaderContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingVertical: verticalScale(20),
   },
+
   loadingText: {
-    marginTop: 10,
-    color: Color.textLight,
-    fontFamily: Fonts.UniNeueRegular,
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    marginTop: 80,
-  },
-  emptyImage: {
-    width: 120,
-    height: 120,
-    opacity: 0.7,
-  },
-  emptyText: {
-    marginTop: 10,
-    fontSize: 14,
-    color: Color.textLight,
-    fontFamily: Fonts.UniNeueRegular,
+    marginTop: verticalScale(12),
+    fontSize: moderateScale(16),
+    color: '#555',
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });

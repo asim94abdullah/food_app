@@ -1,13 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Reactotron from 'reactotron-react-native';
 
-// ⚠️ Replace with your Mac's IP (same Wi-Fi as your phone/emulator)
-const host = '192.168.1.143';
+// ⚠️ Replace with your Mac's local IP address (same Wi-Fi as your device/emulator)
+const host = '192.168.1.114';
 
 const reactotron = Reactotron.setAsyncStorageHandler(AsyncStorage)
   .configure({
     name: 'FoodApp',
-    host, // Important for physical device
+    host,
   })
   .useReactNative({
     networking: {
@@ -16,15 +16,17 @@ const reactotron = Reactotron.setAsyncStorageHandler(AsyncStorage)
   })
   .connect();
 
-Reactotron.clear();
+if (__DEV__) {
+  Reactotron.clear();
 
-// 🔥 Forward all console logs to Reactotron too
-// const yeOldeConsoleLog = console.log;
-// console.log = (...args) => {
-//   yeOldeConsoleLog(...args);
-//   Reactotron.log(...args);
-// };
+  // Forward all console logs to Reactotron
+  const yeOldeConsoleLog = console.log;
+  console.log = (...args) => {
+    yeOldeConsoleLog(...args);
+    Reactotron.log(...args);
+  };
 
-console.tron = Reactotron;
+  console.tron = Reactotron;
+}
 
 export default reactotron;

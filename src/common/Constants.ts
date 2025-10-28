@@ -51,7 +51,7 @@ export const Constants = {
     // test server
     // BASE_URL: "http://175.107.59.78",
     BASE_URL: "http://175.107.59.120",
-    // BASE_URL: "https://591af808a208.ngrok-free.app",
+    // BASE_URL: "https://9e6c9d3d8693.ngrok-free.app",
 }
 
 export const Color = {

@@ -129,30 +129,85 @@ const SendStock = (props: SendStockProps) => {
       return false;
     } else if (parseFloat(qty) <= 0) {
       Alert.alert('Message', 'Please add Jutt/PP50/PP100 quantity');
-      return;
+      return false;
     } else if (parseFloat(bags) <= 0) {
       Alert.alert('Message', 'Please add Jutt/PP50/PP100 Bags');
       return false;
     }
-    // else if (jutt.trim() == "") {
-    //     Alert.alert("Message", "Please enter JUTT")
-    //     return false
-    // }
-    // else if (pp50.trim() == "") {
-    //     Alert.alert("Message", "Please enter PP50")
-    //     return false
-    // }
-    // else if (pp100.trim() == "") {
-    //     Alert.alert("Message", "Please enter PP100")
-    //     return false
-    // }
-    else if (estDelivery.trim() == '') {
+
+    // ✅ IMPORTED WHEAT VALIDATION (both directions)
+
+    // Jute Import
+    else if (
+      parseFloat(juttImpQty) > 0 &&
+      (!juttImpBags || parseFloat(juttImpBags) <= 0)
+    ) {
+      Alert.alert(
+        'Message',
+        'Please enter Jute Import Bags when Imported Wheat Quantity is entered.',
+      );
+      return false;
+    } else if (
+      parseFloat(juttImpBags) > 0 &&
+      (!juttImpQty || parseFloat(juttImpQty) <= 0)
+    ) {
+      Alert.alert(
+        'Message',
+        'Please enter Jute Imported Wheat Quantity when Import Bags are entered.',
+      );
+      return false;
+    }
+
+    // PP50 Import
+    else if (
+      parseFloat(pp50ImpQty) > 0 &&
+      (!pp50ImpBags || parseFloat(pp50ImpBags) <= 0)
+    ) {
+      Alert.alert(
+        'Message',
+        'Please enter PP50 Import Bags when Imported Wheat Quantity is entered.',
+      );
+      return false;
+    } else if (
+      parseFloat(pp50ImpBags) > 0 &&
+      (!pp50ImpQty || parseFloat(pp50ImpQty) <= 0)
+    ) {
+      Alert.alert(
+        'Message',
+        'Please enter PP50 Imported Wheat Quantity when Import Bags are entered.',
+      );
+      return false;
+    }
+
+    // PP100 Import
+    else if (
+      parseFloat(pp100ImpQty) > 0 &&
+      (!pp100ImpBags || parseFloat(pp100ImpBags) <= 0)
+    ) {
+      Alert.alert(
+        'Message',
+        'Please enter PP100 Import Bags when Imported Wheat Quantity is entered.',
+      );
+      return false;
+    } else if (
+      parseFloat(pp100ImpBags) > 0 &&
+      (!pp100ImpQty || parseFloat(pp100ImpQty) <= 0)
+    ) {
+      Alert.alert(
+        'Message',
+        'Please enter PP100 Imported Wheat Quantity when Import Bags are entered.',
+      );
+      return false;
+    }
+
+    // ✅ Continue existing validations
+    else if (estDelivery.trim() === '') {
       Alert.alert('Message', 'Please enter Estimated Delivery Time');
       return false;
-    } else if (drBookNo.trim() == '') {
+    } else if (drBookNo.trim() === '') {
       Alert.alert('Message', 'Please enter DR Book Number');
       return false;
-    } else if (drPageNo.trim() == '') {
+    } else if (drPageNo.trim() === '') {
       Alert.alert('Message', 'Please enter DR Page Number');
       return false;
     } else if (!transTime) {
@@ -164,10 +219,11 @@ const SendStock = (props: SendStockProps) => {
     } else if (!coordinates) {
       Alert.alert(
         'Message',
-        'GPS coordinated are empty, please enable your GPS (location services) & try again. If the issue still persist then reopen the application',
+        'GPS coordinates are empty, please enable your GPS (location services) & try again. If the issue still persists then reopen the application.',
       );
       return false;
     }
+
     return true;
   };
 
@@ -549,7 +605,7 @@ const SendStock = (props: SendStockProps) => {
     pp100IndgBags,
   ]);
 
-  console.log('allocation', allocation);
+  // console.log('allocation', allocation);
 
   return (
     <Container>
