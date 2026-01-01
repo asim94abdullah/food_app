@@ -9,19 +9,19 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import {Button, Card, TextInput} from 'react-native-paper';
-import {moderateScale} from 'react-native-size-matters';
-import {useDispatch, useSelector} from 'react-redux';
+import { Button, Card, TextInput } from 'react-native-paper';
+import { moderateScale } from 'react-native-size-matters';
+import { useDispatch, useSelector } from 'react-redux';
 import Api from '../../api';
-import {Color, DummyForm, DummyItem, Fonts} from '../../common/Constants';
-import {TypeDropdownItem, UserProfile} from '../../common/Type';
-import {getDataFrom, handleError} from '../../common/Utils';
+import { Color, DummyForm, Fonts } from '../../common/Constants';
+import { TypeDropdownItem, UserProfile } from '../../common/Type';
+import { getDataFrom, handleError, isValidCnic, isValidPhone } from '../../common/Utils';
 import Dropdown from '../../components/Dropdown';
 import DynmicForm from '../../components/DynmicForm';
 import FileUploader from '../../components/FileUploader';
-import RadioButton from '../../components/RadioButton';
 import RadioButtonsYesNo from '../../components/RadioButtonsYesNo';
-import {RootState} from '../../redux/store';
+import { RootState } from '../../redux/store';
+import MaskInput from 'react-native-mask-input';
 
 interface MillVoilationsProps {
   onNext: (data: any, fine: string) => void;
@@ -35,7 +35,6 @@ const MillVoilations = ({
   _commonData,
   _step1Response,
 }: MillVoilationsProps) => {
-  // console.log('data', _step1Response);
 
   const form = React.useRef();
   const scrollView = React.useRef();
@@ -54,6 +53,10 @@ const MillVoilations = ({
   const [millsList, setMillsList] = React.useState([]); //_commonData.mills
   const [questionsList, setQuestionsList] = React.useState([]); //_commonData.mills
 
+  const [ownerName, setOwnerName] = React.useState('');
+  const [ownerContact, setOwnerContact] = React.useState('');
+  const [ownerCnic, setOwnerCnic] = React.useState('');
+
   const User = useSelector<RootState, UserProfile>(state => state.data.user);
   const dispatch = useDispatch();
   const api = new Api(User, dispatch);
@@ -61,6 +64,15 @@ const MillVoilations = ({
   const btnClick = () => {
     if (!mill) {
       Alert.alert('Message', 'Please select a mill');
+      return;
+    } else if (!ownerName.trim()) {
+      Alert.alert('Message', 'Please enter owner name');
+      return;
+    } else if (!isValidPhone(ownerContact.trim())) {
+      Alert.alert('Message', 'Please enter valid owner contact');
+      return;
+    } else if (!isValidCnic(ownerCnic.trim())) {
+      Alert.alert('Message', 'Please enter valid owner cnic');
       return;
     } else if (isFined && fineAmount.trim() == '') {
       Alert.alert('Message', 'Please enter fine amount');
@@ -113,7 +125,12 @@ const MillVoilations = ({
         const respData = getDataFrom(response);
         if (respData) {
           // setCommonData(respData)
-          onNext(respData.inspection_mill, fineAmount);
+          onNext({
+            ...respData.inspection_mill,
+            owner_name: ownerName.trim(),
+            owner_contact: ownerContact.trim(),
+            owner_cnic: ownerCnic.trim(),
+          }, fineAmount);
 
           setMill(undefined);
           setAttachments([]);
@@ -192,12 +209,12 @@ const MillVoilations = ({
       <ActivityIndicator
         color={Color.Blue}
         size="large"
-        style={{alignSelf: 'center', margin: 20, marginBottom: 40}}
+        style={{ alignSelf: 'center', margin: 20, marginBottom: 40 }}
       />
     ) : millStats ? (
       <Card style={styles.card}>
         <Card.Content>
-          <View style={[styles.row, {marginBottom: 0}]}>
+          <View style={[styles.row, { marginBottom: 0 }]}>
             <Card.Title title={mill?.title} style={styles.cell} />
             {/* <Text style={styles.txtBold}>No. of Bodies: {"item.no_of_bags"}</Text> */}
           </View>
@@ -242,7 +259,7 @@ const MillVoilations = ({
 
             <View style={styles.row}>
               <View style={styles.cell}>
-                <Text style={[styles.txtBold, {color: '#000', fontSize: 14}]}>
+                <Text style={[styles.txtBold, { color: '#000', fontSize: 14 }]}>
                   {'\n'}Subsidized Wheat Grinding Formula
                 </Text>
                 {/* <Text style={styles.txtSmall}>{"millStats.total_prvt_stock"}</Text> */}
@@ -281,10 +298,8 @@ const MillVoilations = ({
     );
   };
 
-  console.log('questionsList', questionsList);
-
   return (
-    <ScrollView style={{marginVertical: 40}}>
+    <ScrollView style={{ marginVertical: 40 }}>
       <KeyboardAvoidingView>
         <View style={styles.container}>
           <Dropdown
@@ -296,6 +311,50 @@ const MillVoilations = ({
           />
 
           <MillStats />
+
+          <TextInput
+            label="Owner Name"
+            value={ownerName}
+            style={styles.input}
+            onChangeText={setOwnerName}
+          />
+
+          <TextInput
+            mode="flat"
+            label="Owner CNIC No"
+            placeholder="12301-4567890-0"
+            value={ownerCnic}
+            onChangeText={setOwnerCnic}
+            style={styles.input}
+            autoCapitalize='none'
+            keyboardType='number-pad'
+            returnKeyType='next'
+            render={props =>
+              <MaskInput
+                {...props}
+                mask={[/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/]}
+              />
+            }
+          />
+
+
+          <TextInput
+            mode="flat"
+            label="Owner Contact No"
+            placeholder="0301 2345678"
+            value={ownerContact}
+            onChangeText={setOwnerContact}
+            style={styles.input}
+            autoCapitalize='none'
+            keyboardType='number-pad'
+            returnKeyType='next'
+            render={props =>
+              <MaskInput
+                {...props}
+                mask={[/\d/, /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]}
+              />
+            }
+          />
 
           <DynmicForm fields={questionsList || []} ref={form} />
 
@@ -346,6 +405,7 @@ const MillVoilations = ({
             style={styles.input}
             updateFiles={updateAttachments}
             onUploadComplete={saveFileId}
+            inspection={_step1Response?.inspection?.id || _step1Response?.id}
           />
 
           <Button

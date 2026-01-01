@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import * as React from 'react';
 import {
   Text,
@@ -8,35 +8,27 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-  Image,
-  TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import {Asset, launchCamera} from 'react-native-image-picker';
-import {Button, IconButton, TextInput, Card} from 'react-native-paper';
-import {moderateScale} from 'react-native-size-matters';
-import {useDispatch, useSelector} from 'react-redux';
+import { Button, IconButton, TextInput, Card } from 'react-native-paper';
+import { moderateScale } from 'react-native-size-matters';
+import { useDispatch, useSelector } from 'react-redux';
 import Api from '../../api';
 import {
   Color,
-  DummyForm,
-  DummyItem,
   Fonts,
   InputType,
   Routes,
-  StatusText,
 } from '../../common/Constants';
-import {TypeDropdownItem, TypeFile, UserProfile} from '../../common/Type';
-import {getDataFrom, getDataFrom1, handleError} from '../../common/Utils';
+import { TypeDropdownItem, TypeFile, UserProfile } from '../../common/Type';
+import { getDataFrom, getDataFrom1, handleError, isValidCnic, isValidPhone } from '../../common/Utils';
 import Dropdown from '../../components/Dropdown';
-import DynmicForm from '../../components/DynmicForm';
 import FileUploader from '../../components/FileUploader';
-import Icon from '../../components/Icon';
 import MultiSelect from '../../components/MultiSelect';
-import RadioButton from '../../components/RadioButton';
 import RadioButtonsYesNo from '../../components/RadioButtonsYesNo';
-import {RootState} from '../../redux/store';
-import {StackNavigationProp} from '@react-navigation/stack';
+import { RootState } from '../../redux/store';
+import { StackNavigationProp } from '@react-navigation/stack';
+import MaskInput from 'react-native-mask-input';
 
 interface ShopVoilationsProps {
   onNext: (data: any, amoutn: string, shop: TypeDropdownItem) => void;
@@ -70,6 +62,10 @@ const ShopVoilations = ({
   const [voilationradio, setVoilationRadio] = React.useState(false);
   const [gettingMillStats, setGettingMillStats] = React.useState(false);
   const [millStats, setMillStats] = React.useState(undefined);
+
+  const [ownerName, setOwnerName] = React.useState('');
+  const [ownerContact, setOwnerContact] = React.useState('');
+  const [ownerCnic, setOwnerCnic] = React.useState('');
 
   const [shopsList, setShopsList] = React.useState<TypeDropdownItem[]>(
     _commonData.shops,
@@ -169,6 +165,15 @@ const ShopVoilations = ({
     } else if (!shop) {
       Alert.alert('Message', 'Please select shop');
       return;
+    } else if (!ownerName.trim()) {
+      Alert.alert('Message', 'Please enter shop owner name');
+      return;
+    } else if (!isValidPhone(ownerContact.trim())) {
+      Alert.alert('Message', 'Please enter valid shop owner contact');
+      return;
+    } else if (!isValidCnic(ownerCnic.trim())) {
+      Alert.alert('Message', 'Please enter valid shop owner cnic');
+      return;
     } else if (violation.length === 0) {
       Alert.alert('Message', 'Please select violation');
       return;
@@ -195,7 +200,6 @@ const ShopVoilations = ({
     let inspection_id = _step1Response?.inspection?.id
       ? _step1Response?.inspection?.id
       : _step1Response?.id;
-    console.log('iddddddddddddd', inspection_id);
 
     payload.append('id', inspection_id);
     payload.append('shop_type_id', shopType.id);
@@ -212,7 +216,7 @@ const ShopVoilations = ({
       .sendShopStep2Data(payload)
       .then(response => {
         const respData = getDataFrom(response);
-        console.log('Data response', respData.inspection_shop);
+        // console.log('Data response', respData.inspection_shop);
 
         if (respData) {
           Alert.alert(
@@ -223,7 +227,12 @@ const ShopVoilations = ({
                 text: 'OK',
                 onPress: () =>
                   onNext(
-                    respData.inspection_shop,
+                    {
+                      ...respData.inspection_shop,
+                      owner_name: ownerName.trim(),
+                      owner_contact: ownerContact.trim(),
+                      owner_cnic: ownerCnic.trim(),
+                    },
                     fineAmount,
                     shop,
                     voilationStatus?.title,
@@ -241,7 +250,7 @@ const ShopVoilations = ({
   };
 
   const addShop = (data: any) => {
-    console.log('shop.license_number', data.data.shop);
+    // console.log('shop.license_number', data.data.shop);
     // console.log('new-shop', shopsList);
     try {
       // Check if shop already exists using license number
@@ -258,7 +267,7 @@ const ShopVoilations = ({
         };
 
         const newList = [...shopsList, data1];
-        console.log('added', data1);
+        // console.log('added', data1);
         setShopsList(newList);
       }
     } catch (error) {
@@ -358,16 +367,16 @@ const ShopVoilations = ({
       <ActivityIndicator
         color={Color.Blue}
         size="large"
-        style={{alignSelf: 'center', margin: 20, marginBottom: 40}}
+        style={{ alignSelf: 'center', margin: 20, marginBottom: 40 }}
       />
     ) : millStats ? (
       <Card style={styles.card}>
         <Card.Content>
           <View style={[styles.colom]}>
-            <Text style={{fontWeight: '700', color: '#000', fontSize: 14}}>
+            <Text style={{ fontWeight: '700', color: '#000', fontSize: 14 }}>
               Inspection History Of
             </Text>
-            <Text style={{fontWeight: '700', color: '#000', fontSize: 14}}>
+            <Text style={{ fontWeight: '700', color: '#000', fontSize: 14 }}>
               {millStats?.shop_title}
             </Text>
           </View>
@@ -443,7 +452,7 @@ const ShopVoilations = ({
   // console.log('setMillStats', millStats);
 
   return (
-    <ScrollView style={{marginVertical: 40}}>
+    <ScrollView style={{ marginVertical: 40 }}>
       <KeyboardAvoidingView>
         <View style={styles.container}>
           <Dropdown
@@ -454,8 +463,8 @@ const ShopVoilations = ({
             style={styles.input}
           />
 
-          <View style={{flexDirection: 'row'}}>
-            <View style={{flex: 1}}>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ flex: 1 }}>
               <Dropdown
                 data={shopsList}
                 onItemSelect={setShop}
@@ -480,6 +489,50 @@ const ShopVoilations = ({
               }
             />
           </View>
+
+          <TextInput
+            label="Owner Name"
+            value={ownerName}
+            style={styles.input}
+            onChangeText={setOwnerName}
+          />
+
+          <TextInput
+            mode="flat"
+            label="Owner CNIC No"
+            placeholder="12301-4567890-0"
+            value={ownerCnic}
+            onChangeText={setOwnerCnic}
+            style={styles.input}
+            autoCapitalize='none'
+            keyboardType='number-pad'
+            returnKeyType='next'
+            render={props =>
+              <MaskInput
+                {...props}
+                mask={[/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/]}
+              />
+            }
+          />
+
+          <TextInput
+            mode="flat"
+            label="Owner Contact No"
+            placeholder="0301 2345678"
+            value={ownerContact}
+            onChangeText={setOwnerContact}
+            style={styles.input}
+            autoCapitalize='none'
+            keyboardType='number-pad'
+            returnKeyType='next'
+            render={props =>
+              <MaskInput
+                {...props}
+                mask={[/\d/, /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]}
+              />
+            }
+          />
+
           <RadioButtonsYesNo
             title={'Voilations'}
             value={voilationradio}
@@ -524,30 +577,30 @@ const ShopVoilations = ({
           {violation?.some(
             violation => violation.title == 'Other Violation',
           ) && (
-            <TextInput
-              mode="flat"
-              label={'Other Violation'}
-              placeholder={'Details...'}
-              value={otherVoilation}
-              onChangeText={newText => {
-                const englishLetterRegex =
-                  /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?\s]+$/;
-                // console.log('text', newText);
-                if (newText === '') {
-                  setOtherVoilation('');
-                }
-                // setTitle(newText);
+              <TextInput
+                mode="flat"
+                label={'Other Violation'}
+                placeholder={'Details...'}
+                value={otherVoilation}
+                onChangeText={newText => {
+                  const englishLetterRegex =
+                    /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?\s]+$/;
+                  // console.log('text', newText);
+                  if (newText === '') {
+                    setOtherVoilation('');
+                  }
+                  // setTitle(newText);
 
-                if (englishLetterRegex.test(newText)) {
-                  setOtherVoilation(newText);
-                } else {
-                  console.log('Invalid character entered');
-                }
-              }}
-              style={styles.input}
-              returnKeyType="next"
-            />
-          )}
+                  if (englishLetterRegex.test(newText)) {
+                    setOtherVoilation(newText);
+                  } else {
+                    console.log('Invalid character entered');
+                  }
+                }}
+                style={styles.input}
+                returnKeyType="next"
+              />
+            )}
 
           {voilationradio === true && (
             <Dropdown
@@ -605,25 +658,25 @@ const ShopVoilations = ({
           {((voilationradio === true && voilationStatus?.title === 'Fine') ||
             voilationStatus?.title === 'Marasla' ||
             voilationStatus?.title === 'Notice') && (
-            <Button
-              mode="contained"
-              style={styles.btn}
-              loading={sendingData}
-              onPress={btnClickWithVoilation}>
-              Save & Next
-            </Button>
-          )}
+              <Button
+                mode="contained"
+                style={styles.btn}
+                loading={sendingData}
+                onPress={btnClickWithVoilation}>
+                Save & Next
+              </Button>
+            )}
           {((voilationradio === true &&
             voilationStatus?.title === 'Imprison') ||
             voilationStatus?.title === 'Warning') && (
-            <Button
-              mode="contained"
-              style={styles.btn}
-              loading={sendingData}
-              onPress={btnClickWithVoilation}>
-              Save
-            </Button>
-          )}
+              <Button
+                mode="contained"
+                style={styles.btn}
+                loading={sendingData}
+                onPress={btnClickWithVoilation}>
+                Save
+              </Button>
+            )}
 
           {/* <Button
             mode="contained"

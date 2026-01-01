@@ -1,32 +1,27 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import moment from 'moment';
 import * as React from 'react';
-import {Text, View, StyleSheet, ActivityIndicator, Alert} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {Button} from 'react-native-paper';
+import { Text, View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Button } from 'react-native-paper';
+import 'text-encoding';
 import QRCode from 'react-native-qrcode-svg';
-import {
-  request,
-  PERMISSIONS,
-  RESULTS,
-  requestMultiple,
-} from 'react-native-permissions';
 import ViewShot from 'react-native-view-shot';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Api from '../api';
 import LogoSimple from '../assets/svg/LogoSimple';
-import {Color, Constants, Fonts, Routes} from '../common/Constants';
-import {UserProfile} from '../common/Type';
-import {getCode, getDataFrom, handleError} from '../common/Utils';
+import { Color, Fonts, Routes } from '../common/Constants';
+import { UserProfile } from '../common/Type';
+import { getCode, getDataFrom, handleError } from '../common/Utils';
 import Container from '../components/Container';
 import Header from '../components/Header';
 import PrinterManager from '../components/PrinterManager';
-import {RootState} from '../redux/store';
+import { RootState } from '../redux/store';
 
-interface EchallanProps {}
+interface EchallanProps { }
 
 const Echallan = (props: EchallanProps) => {
-  const {data, shopInspection, trackingId, inspection} = useRoute().params;
+  const { data, shopInspection, trackingId, inspection } = useRoute().params;
 
   const [isLoaing, setIsLoading] = React.useState(true);
   const [challan, setChallan] = React.useState();
@@ -39,6 +34,7 @@ const Echallan = (props: EchallanProps) => {
   const [showPrinter, setShowPrinter] = React.useState(false);
   const [printing, setPrinting] = React.useState(false);
   const [imgPath, setImgPath] = React.useState('');
+  const [newInspectionData, setNewInspectionData] = React.useState({});
 
   const titleShot = React.useRef<React.LegacyRef<ViewShot> | undefined>();
   const headerShot = React.useRef<React.LegacyRef<ViewShot> | undefined>();
@@ -69,7 +65,7 @@ const Echallan = (props: EchallanProps) => {
     // shopInspection ? challan?.shops[0]?.title : challan?.mills[0]?.name
   };
 
-  const getTitle = () => (shopInspection ? 'Shop' : 'Mill');
+  // const getTitle = () => (shopInspection ? 'Shop' : 'Mill');
 
   const printInvoice = async () => {
     setPrinting(true);
@@ -80,12 +76,12 @@ const Echallan = (props: EchallanProps) => {
     const amountUri = await amountShot.current?.capture();
     const footerUri = await footerShot.current?.capture();
 
-    console.log('titleUri', titleUri);
-    console.log('headerUri', headerUri);
-    console.log('qrUri', qrUri);
-    console.log('officerUri', officerUri);
-    console.log('amountUri', amountUri);
-    console.log('footerUri', footerUri);
+    // console.log('titleUri', titleUri);
+    // console.log('headerUri', headerUri);
+    // console.log('qrUri', qrUri);
+    // console.log('officerUri', officerUri);
+    // console.log('amountUri', amountUri);
+    // console.log('footerUri', footerUri);
 
     // setImgPath(
     //   '[C]<font size='normal'><b>Directorate of Food </b></font> \n' +
@@ -128,24 +124,24 @@ const Echallan = (props: EchallanProps) => {
 
     setImgPath(
       '[C]<img>' +
-        titleUri +
-        '</img>\n' +
-        '[C]<img>https://raw.githubusercontent.com/geek-ibrar/tmp_files/master/food-logo-bw-sm.jpg</img>\n' +
-        '[C]<img>' +
-        headerUri +
-        '</img>\n' +
-        '[C]<img>' +
-        qrUri +
-        '</img>\n' +
-        '[C]<img>' +
-        officerUri +
-        '</img>\n' +
-        '[C]<img>' +
-        amountUri +
-        '</img>\n' +
-        '[C]<img>' +
-        footerUri +
-        '</img>',
+      titleUri +
+      '</img>\n' +
+      '[C]<img>https://raw.githubusercontent.com/geek-ibrar/tmp_files/master/food-logo-bw-sm.jpg</img>\n' +
+      '[C]<img>' +
+      headerUri +
+      '</img>\n' +
+      '[C]<img>' +
+      qrUri +
+      '</img>\n' +
+      '[C]<img>' +
+      officerUri +
+      '</img>\n' +
+      '[C]<img>' +
+      amountUri +
+      '</img>\n' +
+      '[C]<img>' +
+      footerUri +
+      '</img>',
     );
     setShowPrinter(true);
     setPrinting(false);
@@ -159,6 +155,10 @@ const Echallan = (props: EchallanProps) => {
     const payload = new FormData();
     // payload.append(shopInspection ? "inspection_shop_id" : "inspection_mill_id", data.id)
     // let request = shopInspection ? api.getShopEChallan(payload) : api.getEChallan(payload)
+    payload.append('owner_name', data?.owner_name || '');
+    payload.append('owner_contact', data?.owner_contact?.replaceAll(" ", "") || '');
+    payload.append('owner_cnic', data?.owner_cnic?.replaceAll("-", "") || '');
+
     let request = undefined;
     if (inspection == Routes.MillsInspection) {
       payload.append('inspection_mill_id', data.id);
@@ -176,9 +176,10 @@ const Echallan = (props: EchallanProps) => {
       .then(response => {
         const respData = getDataFrom(response);
         if (respData) {
-          const {inspection_data} = respData;
-          console.log('resp-data', JSON.stringify(inspection_data.inspection));
-          setChallan({...inspection_data, tracking_url: respData.tracking_url});
+          setNewInspectionData(respData);
+          const { inspection_data } = respData;
+          // console.log('resp-data', JSON.stringify(inspection_data.inspection));
+          setChallan({ ...inspection_data, tracking_url: respData.tracking_url });
           try {
             setOfficerName(inspection_data?.inspection?.officers[0]);
             if (shopInspection) {
@@ -209,17 +210,17 @@ const Echallan = (props: EchallanProps) => {
     <Container hideBg={true}>
       <Header title="E-Challan" />
       {isLoaing ? (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator />
         </View>
       ) : challan ? (
         <>
-          <ScrollView contentContainerStyle={{flexGrow: 1}}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={styles.container}>
               <View
                 style={{
                   alignItems: 'center',
-                  height: 300,
+                  height: 330,
                   backgroundColor: 'white',
                 }}>
                 <ViewShot
@@ -235,7 +236,7 @@ const Echallan = (props: EchallanProps) => {
                         <Text
                           style={[
                             styles.heading1,
-                            {textAlign: 'center', fontSize: 18},
+                            { textAlign: 'center', fontSize: 18 },
                           ]}>
                           Office of Rashning Food Controller {'\n'}
                           {User?.company?.district?.title}
@@ -244,7 +245,7 @@ const Echallan = (props: EchallanProps) => {
                         <Text
                           style={[
                             styles.heading1,
-                            {textAlign: 'center', fontSize: 18},
+                            { textAlign: 'center', fontSize: 18 },
                           ]}>
                           Office of District Food Controller {'\n'}
                           {User?.company?.district?.title}
@@ -254,7 +255,7 @@ const Echallan = (props: EchallanProps) => {
                   </>
                 </ViewShot>
                 <LogoSimple
-                  style={{transform: [{scale: 0.6}]}}
+                  style={{ transform: [{ scale: 0.6 }] }}
                   hideTxt={true}
                 />
                 <ViewShot
@@ -266,8 +267,8 @@ const Echallan = (props: EchallanProps) => {
                   }}>
                   <View style={styles.header}>
                     <Text style={styles.heading1}>e-Challan</Text>
-                    <Text style={styles.heading2}>Tracking # {trackingId}</Text>
-                    {/* <Text style={styles.heading2}>Tracking # {challan?.tracking_id}</Text> */}
+                    <Text style={styles.heading2}>Tracking # {newInspectionData?.voucher_tracking_id || trackingId}</Text>
+                    {newInspectionData?.psid ? <Text style={[styles.heading2, { marginVertical: 5 }]}>PSID # {newInspectionData?.psid}</Text> : null}
                     <Text style={styles.txtSm}>
                       Generated on:{' '}
                       {'\n' +
@@ -334,7 +335,7 @@ const Echallan = (props: EchallanProps) => {
                       <Text
                         style={[
                           styles.headingrole,
-                          {textAlign: 'right', width: '50%'},
+                          { textAlign: 'right', width: '50%' },
                         ]}>
                         {voilations}
                       </Text>
@@ -360,9 +361,11 @@ const Echallan = (props: EchallanProps) => {
                     <Text style={styles.headingrole}>{getBusinessName()}</Text>
                   </View>
                   <View style={styles.header}>
-                    <Text style={[styles.heading1, {textAlign: 'center'}]}>
-                      Please deposit due{'\n'}
-                      amount in the DFC Office{'\n'}
+                    <Text style={[styles.heading1, { textAlign: 'center' }]}>
+                      {/* Please deposit due{'\n'}
+                      amount in the DFC Office{'\n'} */}
+                      {newInspectionData?.footer_message || `Please deposit due\namount in the DFC Office`}
+                      {'\n'}
                     </Text>
                     <Text
                       style={{

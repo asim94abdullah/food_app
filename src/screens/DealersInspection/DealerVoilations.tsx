@@ -1,4 +1,3 @@
-import {useNavigation} from '@react-navigation/native';
 import * as React from 'react';
 import {
   Text,
@@ -8,32 +7,23 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-  Image,
-  TouchableOpacity,
 } from 'react-native';
-import {Asset, launchCamera} from 'react-native-image-picker';
-import {Button, IconButton, TextInput} from 'react-native-paper';
-import {moderateScale} from 'react-native-size-matters';
-import {useDispatch, useSelector} from 'react-redux';
+import { Button, TextInput } from 'react-native-paper';
+import { moderateScale } from 'react-native-size-matters';
+import { useDispatch, useSelector } from 'react-redux';
 import Api from '../../api';
 import {
   Color,
-  DummyForm,
-  DummyItem,
   Fonts,
   InputType,
-  Routes,
 } from '../../common/Constants';
-import {TypeDropdownItem, TypeFile, UserProfile} from '../../common/Type';
-import {getDataFrom, handleError} from '../../common/Utils';
+import { TypeDropdownItem, TypeFile, UserProfile } from '../../common/Type';
+import { getDataFrom, handleError, isValidCnic, isValidPhone } from '../../common/Utils';
 import Dropdown from '../../components/Dropdown';
-import DynmicForm from '../../components/DynmicForm';
 import FileUploader from '../../components/FileUploader';
-import Icon from '../../components/Icon';
-import MultiSelect from '../../components/MultiSelect';
-import RadioButton from '../../components/RadioButton';
 import RadioButtonsYesNo from '../../components/RadioButtonsYesNo';
-import {RootState} from '../../redux/store';
+import { RootState } from '../../redux/store';
+import MaskInput from 'react-native-mask-input';
 
 interface DealerVoilationsProps {
   onNext: (data: any, amoutn: string) => void;
@@ -71,17 +61,29 @@ const DealerVoilations = ({
   const [blacklisted, setBlacklisted] = React.useState(false);
   const [irregularities, setIrregularities] = React.useState('');
 
+  const [ownerName, setOwnerName] = React.useState('');
+  const [ownerContact, setOwnerContact] = React.useState('');
+  const [ownerCnic, setOwnerCnic] = React.useState('');
+
   const [shopsList, setShopsList] =
     React.useState<TypeDropdownItem[]>(_commonData.dealers) || [];
 
   const User = useSelector<RootState, UserProfile>(state => state.data.user);
-  const navigation = useNavigation();
   const dispatch = useDispatch();
   const api = new Api(User, dispatch);
 
   const btnClick = () => {
     if (!shop) {
       Alert.alert('Message', 'Please select a dealer');
+      return;
+    } else if (!ownerName.trim()) {
+      Alert.alert('Message', 'Please enter owner name');
+      return;
+    } else if (!isValidPhone(ownerContact.trim())) {
+      Alert.alert('Message', 'Please enter valid owner contact');
+      return;
+    } else if (!isValidCnic(ownerCnic.trim())) {
+      Alert.alert('Message', 'Please enter valid owner cnic');
       return;
     } else if (isFined && fineAmount.trim() == '') {
       Alert.alert(
@@ -119,7 +121,12 @@ const DealerVoilations = ({
       .then(response => {
         const respData = getDataFrom(response);
         if (respData) {
-          onNext(respData.inspection_dealer, fineAmount);
+          onNext({
+            ...respData.inspection_dealer,
+            owner_name: ownerName.trim(),
+            owner_contact: ownerContact.trim(),
+            owner_cnic: ownerCnic.trim(),
+          }, fineAmount);
 
           // setMill(undefined)
           // setAttachments([])
@@ -197,6 +204,49 @@ const DealerVoilations = ({
             label="Choose dealer"
             value={shop}
             style={styles.input}
+          />
+
+          <TextInput
+            label="Owner Name"
+            value={ownerName}
+            style={styles.input}
+            onChangeText={setOwnerName}
+          />
+
+          <TextInput
+            mode="flat"
+            label="Owner CNIC No"
+            placeholder="12301-4567890-0"
+            value={ownerCnic}
+            onChangeText={setOwnerCnic}
+            style={styles.input}
+            autoCapitalize='none'
+            keyboardType='number-pad'
+            returnKeyType='next'
+            render={props =>
+              <MaskInput
+                {...props}
+                mask={[/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/]}
+              />
+            }
+          />
+
+          <TextInput
+            mode="flat"
+            label="Owner Contact No"
+            placeholder="0301 2345678"
+            value={ownerContact}
+            onChangeText={setOwnerContact}
+            style={styles.input}
+            autoCapitalize='none'
+            keyboardType='number-pad'
+            returnKeyType='next'
+            render={props =>
+              <MaskInput
+                {...props}
+                mask={[/\d/, /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]}
+              />
+            }
           />
 
           <Text style={styles.title}>Voilations</Text>
@@ -313,6 +363,7 @@ const DealerVoilations = ({
             updateFiles={updateAttachments}
             onUploadComplete={addFileId}
             isShop={true}
+            inspection={_step1Response?.inspection?.id || _step1Response?.id}
           />
 
           <Button

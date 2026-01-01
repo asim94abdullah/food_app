@@ -8,9 +8,9 @@ import moment from 'moment';
 import reactotron from "reactotron-react-native";
 
 export const getDataFrom = (response: AxiosResponse<any, any>) => {
-        // console.log('response', JSON.stringify (response));
+    // console.log('response', JSON.stringify (response));
     const { data } = response
-       
+
     if (data.success) {
         // console.log('data calledddd');
         return data.data
@@ -20,9 +20,9 @@ export const getDataFrom = (response: AxiosResponse<any, any>) => {
     }
 }
 export const getDataFrom1 = (response: AxiosResponse<any, any>) => {
-        // console.log('response', JSON.stringify (response));
+    // console.log('response', JSON.stringify (response));
     const { data } = response
-       
+
     if (data.success) {
         // console.log('data calledddd');
         return data
@@ -52,7 +52,7 @@ export const formatDropdownData = (data: any): TypeDropdownItem[] => Object.entr
 
 export const getCode = (data: any) => {
     //  console.log('Data tracking',data);
-     
+
     return data?.tracking_url
 }
 
@@ -67,6 +67,16 @@ export const TrackEvent = (eventName: string, data?: { [name: string]: string; }
 
 export const formatDateForServer = (date: Date) => moment(date).format("YYYY-MM-DD")
 export const formatDateTimeForServer = (date: Date) => moment(date).format("YYYY-MM-DD hh:mm:ss a")
+
+export const isValidCnic = (cnic: string) => {
+    const cnicRegex = /^[0-9]{13}$/;
+    return cnicRegex.test(cnic.replaceAll('-', ''));
+}
+
+export const isValidPhone = (phone: string) => {
+    const phoneRegex = /^[0-9]{11}$/;
+    return phoneRegex.test(phone.replaceAll(' ', ''));
+}
 
 export const Log = (...args: any) => {
     __DEV__ && reactotron.log?.(args)
