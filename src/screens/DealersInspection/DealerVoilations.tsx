@@ -115,6 +115,9 @@ const DealerVoilations = ({
     payload.append('dual_quota', dualQuota ? 'yes' : 'no');
     payload.append('irregularities', irregularities);
     payload.append('attachment_ids', attachmentIds.join(','));
+    payload.append('owner_name', ownerName.trim() || '');
+    payload.append('owner_contact', ownerContact.trim()?.replaceAll(" ", "") || '');
+    payload.append('owner_cnic', ownerCnic.trim()?.replaceAll("-", "") || '');
 
     api
       .sendDealerStep2Data(payload)

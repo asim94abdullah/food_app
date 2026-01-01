@@ -95,6 +95,10 @@ const MillVoilations = ({
     payload.append('quota_cancelled', isSuspend ? 'yes' : 'no');
     payload.append('warned', isWarned ? 'yes' : 'no');
 
+    payload.append('owner_name', ownerName.trim() || '');
+    payload.append('owner_contact', ownerContact.trim()?.replaceAll(" ", "") || '');
+    payload.append('owner_cnic', ownerCnic.trim()?.replaceAll("-", "") || '');
+
     let isError = false;
     _commonData.questionnare.forEach(question => {
       // name_1[]

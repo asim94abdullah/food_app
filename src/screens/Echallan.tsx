@@ -4,7 +4,6 @@ import * as React from 'react';
 import { Text, View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Button } from 'react-native-paper';
-import 'text-encoding';
 import QRCode from 'react-native-qrcode-svg';
 import ViewShot from 'react-native-view-shot';
 import { useDispatch, useSelector } from 'react-redux';
@@ -170,7 +169,6 @@ const Echallan = (props: EchallanProps) => {
       payload.append('inspection_dealer_id', data.id);
       request = api.getDealerEChallan(payload);
     }
-    // console.log('payload', payload);
 
     request
       .then(response => {

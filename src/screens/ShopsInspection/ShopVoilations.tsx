@@ -102,6 +102,10 @@ const ShopVoilations = ({
     payload.append('id', inspection_id);
     payload.append('shop_type_id', shopType.id);
     payload.append('shop_id', shop.id);
+    payload.append('owner_name', ownerName.trim() || '');
+    payload.append('owner_contact', ownerContact.trim()?.replaceAll(" ", "") || '');
+    payload.append('owner_cnic', ownerCnic.trim()?.replaceAll("-", "") || '');
+
     // payload.append('fine', fineAmount || 0);
     // payload.append(
     //   'violation_ids',
@@ -210,6 +214,10 @@ const ShopVoilations = ({
     payload.append('attachment_ids', attachmentIds.join(','));
     payload.append('is_violation', voilationradio);
     payload.append('inspection_action_id', voilationStatus?.id);
+    payload.append('owner_name', ownerName.trim() || '');
+    payload.append('owner_contact', ownerContact.trim()?.replaceAll(" ", "") || '');
+    payload.append('owner_cnic', ownerCnic.trim()?.replaceAll("-", "") || '');
+
 
     console.log('Payload', payload);
     api
