@@ -176,17 +176,7 @@ const Echallan = (props: EchallanProps) => {
       .then(async response => {
         const respData = getDataFrom(response);
         if (respData) {
-          try {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            const psidPayload = new FormData();
-            psidPayload.append('voucher_tracking_id', respData.voucher_tracking_id);
-            const psidResponse = await api.getPSID(psidPayload);
-            const psidData = getDataFrom(psidResponse);
-            console.log('psidData', psidData);
-            setNewInspectionData({...respData, psid: psidData?.psid});
-          } catch (error) {
-            setNewInspectionData(respData);
-          }
+          setNewInspectionData(respData);
 
           console.log('resp-data', JSON.stringify(respData));
           const { inspection_data } = respData;
