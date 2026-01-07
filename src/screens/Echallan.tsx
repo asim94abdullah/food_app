@@ -158,12 +158,14 @@ const Echallan = (props: EchallanProps) => {
     payload.append('owner_contact', data?.owner_contact?.replaceAll(" ", "") || '');
     payload.append('owner_cnic', data?.owner_cnic?.replaceAll("-", "") || '');
 
+    console.log('inspection', inspection);
     let request = undefined;
     if (inspection == Routes.MillsInspection) {
       payload.append('inspection_mill_id', data.id);
       request = api.getEChallan(payload);
     } else if (inspection == Routes.ShopsInspection) {
       payload.append('inspection_shop_id', data.id);
+      console.log('payload shop', payload);
       request = api.getShopEChallan(payload);
     } else {
       payload.append('inspection_dealer_id', data.id);
@@ -171,10 +173,22 @@ const Echallan = (props: EchallanProps) => {
     }
 
     request
-      .then(response => {
+      .then(async response => {
         const respData = getDataFrom(response);
         if (respData) {
-          setNewInspectionData(respData);
+          try {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            const psidPayload = new FormData();
+            psidPayload.append('voucher_tracking_id', respData.voucher_tracking_id);
+            const psidResponse = await api.getPSID(psidPayload);
+            const psidData = getDataFrom(psidResponse);
+            console.log('psidData', psidData);
+            setNewInspectionData({...respData, psid: psidData?.psid});
+          } catch (error) {
+            setNewInspectionData(respData);
+          }
+
+          console.log('resp-data', JSON.stringify(respData));
           const { inspection_data } = respData;
           // console.log('resp-data', JSON.stringify(inspection_data.inspection));
           setChallan({ ...inspection_data, tracking_url: respData.tracking_url });

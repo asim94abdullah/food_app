@@ -108,6 +108,10 @@ export default class Api {
         return this.api.post('/dealer-inspections/echallan', data);
     }
 
+    getPSID(data: FormData) {
+        return this.api.post(`/get-psid-by-tracking-id`, data);
+    }
+
     getDealerCommonData(isSilent?: boolean) {
         // console.log(`/supplychain/atta-common?background=${isSilent ? "1" : "0"}`);
         return this.api.get(`/supplychain/atta-common?background=${isSilent ? "1" : "0"}`);
