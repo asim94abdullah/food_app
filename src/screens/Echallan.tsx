@@ -269,8 +269,8 @@ const Echallan = (props: EchallanProps) => {
                   }}>
                   <View style={styles.header}>
                     <Text style={styles.heading1}>e-Challan</Text>
-                    <Text style={styles.heading2}>Tracking # {newInspectionData?.voucher_tracking_id || trackingId}</Text>
-                    {newInspectionData?.psid ? <Text style={[styles.heading2, { marginVertical: 5 }]}>PSID # {newInspectionData?.psid}</Text> : null}
+                    {newInspectionData?.psid ? <Text style={[styles.heading2, { marginVertical: 5 }]}>PSID {newInspectionData?.psid}</Text> : null}
+                    <Text style={styles.heading2}>Tracking No:{'\n'}{newInspectionData?.voucher_tracking_id || trackingId}</Text>
                     <Text style={styles.txtSm}>
                       Generated on:{' '}
                       {'\n' +
@@ -436,9 +436,11 @@ const styles = StyleSheet.create({
   heading2: {
     fontFamily: Fonts.UniNeueBold,
     fontSize: 14,
+    textAlign: 'center',
   },
   headingrole: {
     fontSize: 14,
+    textAlign: 'center',
   },
   txtSm: {
     fontFamily: Fonts.UniNeueRegular,
